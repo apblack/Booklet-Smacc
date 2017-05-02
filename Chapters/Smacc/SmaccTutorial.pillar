@@ -1,23 +1,23 @@
 !! A first SmaCC tutorial
 
 This is a walk-through tutorial to demonstrate some features of SmaCC, the Smalltalk Compiler Compiler. 
-This tutorial develop a simple calculator. This tutorial was originally developed by Don Roberts and John Brant and improved by T. Goubier, S. Ducasse and J. Lecerf.
+This tutorial develops a simple calculator. This tutorial was originally developed by Don Roberts and John Brant and improved by T. Goubier, S. Ducasse and J. Lecerf.
 
 
 !!! Opening the tools
-Once you have loaded the code, you need to open the SmaCC Parser Generator (Figure *@SmaCCGUI*). In Pharo, it is in the Tools submenu of the main menu.
+Once you have loaded the code, you need to open the SmaCC Parser Generator (Figure *@SmaCCGUI*). In Pharo, it is located in the Tools submenu of the main menu.
 
 +SmaCC GUI Tool: The place to define the scanner and parser.>file://figures/SmaCCGUI.png|width=80|label=SmaCCGUI+
 
 Our first calculator is going to be relatively simple. It is going to take two numbers and add them together. 
 To get started
-- Edit the definition the pane below the compile LR(1) buttons.
+- Edit the definition pane below the compile LR(1) buttons.
 - Once you are done: 
 -- Click on the Scanner class and type ExpressionScanner.
 -- Click on the Parser class and type ExpressionParser.
 - press either Compiler LR(1) or Compiled LALR(1) buttons.
 
-Now you are ready to edit first your scanner and parser. Not that you edit everything in one file (edited using the tools) and once compiled the tools will generate two classes and fill them with adequate information as shown as Figure *@SmaCCTutorial*.
+Now you are ready to edit your first scanner and parser. Note that you edit everything in one file (edited using the tools) and once compiled the tools will generate two classes and fill them with adequate information as shown as Figure *@SmaCCTutorial*.
 
 
 !!! First the scanner
@@ -74,9 +74,7 @@ SmaCCScanner >> comment
 	^ self whitespace
 ]]]
 
-The only other token that will appear in our system would be the ==\+== token for addition. However, since this is token is always the same, we can enter it directly in our production rules.
-
-@@todo SD: I do not get the previous sentence. 
+The only other token that will appear in our system would be the ==\+== token for addition. However, since this is token is always the same, we can enter it directly in our production rules. This is syntactic sugar you can use instead of ==<plus> : \\+ ;== when you don't need regular expressions to define a token.
 
 !!! Second the calculator grammar
 Speaking of our grammar, let's go ahead and define it. Enter the following specification below your two previous rules in the editor pane as shown in Figure *@SmaCCTutorial*.
@@ -95,8 +93,10 @@ This basically says that an expression is either a number or an expression added
 
 +First grammar: the Scanner part followed by the Parser part.>file://figures/SmaCCTutorial.png|width=80|label=SmaCCTutorial+
 
-!!! Compile the Scanner and the Parser
+!!! Compiling the Scanner and the Parser
 We should be able to compile a parser now. First, we need to specify the scanner and parser classes to create. These are entered from the ==...== buttons for scanner class and parser class. Enter ==CalculatorScanner== and ==CalculatorParser== respectively. Once the class names are entered, we are ready to compile the parser. Press Compile LR(1) or Compile LALR(1). This will create new Pharo classes for the ==CalculatorScanner== and ==CalculatorParser== and compile several methods in those classes. All methods that SmaCC compiles will go into a "generated" method protocol. You should not change those methods or add new methods to the "generated" method protocols since they are replaced or deleted each time you compile.
+
+@@todo JL: This is somewhat a duplicate of what is said in the intro (with ExpressionScanner/Parser)
 
 Whenever SmaCC creates new classes, they are compiled in the package (or package tag) named on the Package entry box. You may wish to select a different package by pressing '...'.
 
