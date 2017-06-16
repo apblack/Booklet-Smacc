@@ -24,33 +24,32 @@ For example:
 
 !!! Unit testing
 
-Often you would like to test productions that are not top productions. In this case, you should add start symbol that specify that we can access different productions. 
+Often you would like to test productions that are not top productions. This is really useful to validate every part of the grammar individually and to have non-regression tests while building your parser. In this case, you should add start symbol that specify that we can access different productions. 
 For example if you add the following to an hypothetical grammar:
 
 [[[
 %start file expression statement declaration;
 ]]]
 
-SmaCC will generate the following class methods on the parseur: ==startingStateForfile==, ==startingStateForexpression==, ==startingStateForstatement== and ==startingStateFordeclaration==.
+SmaCC will generate the following class methods on the parser: ==startingStateForfile==, ==startingStateForexpression==, ==startingStateForstatement== and ==startingStateFordeclaration==.
 
+You can then invoke your parser on your program using a specific starting state. Since you want to reuse this behaviour, you can either put it in ==YourParserTest== class as a support method:
 
 [[[
-YourParserTest >> parseExpressionTest: str
-	((YourParser on: (ReadStream on: str)) setStartingState: YourParser startingStateForexpression) parse.
+YourParserTest >> parseExpressionTest: aString
+	((YourParser on: (ReadStream on: aString)) setStartingState: YourParser startingStateForexpression) parse.
 ]]]
 
-If you do not want to duplicate the logic in your tests you can extend the parser itself as follows. It is a design decision that is up to you. 
+Or, if you do not want to duplicate the logic in your tests you can extend the parser itself as follows. It is a design decision that is up to you.
 
 [[[
 YourParser >> parseExpression: aString
-	"Parse an statement."
+	"Parse an expression."
 
 	^ (self on: (ReadStream on: aString))
 		setStartingState: self startingStateForexpression;
 		parse
 ]]]
-
-This is useful when you incrementally build your grammar and want to test it at different points. 
 
 !!! Parsing indentation dependent languages
 
@@ -60,9 +59,32 @@ This is useful when you incrementally build your grammar and want to test it at 
 
 !!! Tips and Tricks 
 
-ANTRL conversion tips and tricks
+Sometimes you might have a grammar for your language that is for another type of parser generator (ANTLR for example) and want to convert it to the SmaCC format. 
 
 !!!! Fusion
+
+In LL(k) parsers, the lookahead can be increased, which is not the case for the LR(1)/LALR(1) of SmaCC. You can encounter some problems when converting your grammar, since it will be ambiguous.
+A simple trick that can work in some cases is merging multiple tokens into a single one.
+For example, for the Solidity parser we had ambiguities for the key-value pairs.
+
+Simplified ambiguous version:
+
+[[[
+Expression
+    : Expression ("," Expression)* 
+    | <id> ;
+
+KeyValueList
+    : <id> ":" Expression ("," <id> ":" Expression)* ;
+]]]
+
+Simplified fused version:
+
+[[[
+<idkey>: , <id> : ;
+KeyValueList
+    : <id> ":" Expression (<idkey> Expression)* ;
+]]]
 
 !!!! identifier vs. type
 
